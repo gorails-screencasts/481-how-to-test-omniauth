@@ -9,6 +9,10 @@ module Users
       redirect_to root_path, alert: "Something went wrong"
     end
 
+    def developer
+      handle_auth "Developer"
+    end
+
     def facebook
       handle_auth "Facebook"
     end
@@ -43,6 +47,10 @@ module Users
       request.env['omniauth.auth']
     end
 
+    def omniauth_params
+      request.env['omniauth.params']
+    end
+
     def set_service
       @service = Service.where(provider: auth.provider, uid: auth.uid).first
     end
@@ -75,7 +83,7 @@ module Users
     def create_user
       User.create(
         email: auth.info.email,
-        #name: auth.info.name,
+        name: omniauth_params["name"], #auth.info.name,
         password: Devise.friendly_token[0,20]
       )
     end
